@@ -1,7 +1,7 @@
 # Environment files
-.env
 config.env
 config/config.env
+.env
 
 
 # Node modules
