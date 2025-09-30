@@ -30,7 +30,10 @@ jobs:
             # Build the project
             - name: Build project (Vite with GitHub Pages base)
               working-directory: ./client
-              run: VITE_DEPLOY=github npm run build
+              env:
+                VITE_DEPLOY: github
+                VITE_API_BASE: ${{ secrets.VITE_API_BASE }}
+              run: npm run build
 
             # Add SPA fallback (serve index.html on 404 refreshes)
             - name: Add 404.html fallback
