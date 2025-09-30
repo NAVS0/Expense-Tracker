@@ -1,37 +1,49 @@
 name: Deploy React + Vite to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+
 
 jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
+    build-deploy:
+        runs-on: ubuntu-latest
+        
+        steps:
+            # Checkout the repository
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-    steps:
-      # Checkout the repository
-      - name: Checkout code
-        uses: actions/checkout@v4
+            # Setup Nodejs
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: 22
+            
+            # Install dependencies (client)
+            - name: Install dependencies
+              working-directory: ./client
+              run: npm ci
 
-      # Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+            # Build the project
+            - name: Build project (Vite with GitHub Pages base)
+              working-directory: ./client
+              run: VITE_DEPLOY=github npm run build
 
-      # Install Dependencies
-      - name: Install Dependencies
-        run: npm install
+            # Add SPA fallback (serve index.html on 404 refreshes)
+            - name: Add 404.html fallback
+              working-directory: ./client/dist
+              run: cp index.html 404.html
+            
+            # Deploy to GitHub Pages
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                publish_dir: client/dist
 
-      # Build the project
-      - name: Build project
-        run: npm run build
 
-      # Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+
+            

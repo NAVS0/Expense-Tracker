@@ -2,6 +2,11 @@ import { createContext, useReducer } from 'react'
 import AppReducer from './AppReducer'
 import axios from 'axios'
 
+// Configure API base URL from env for production deployments
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE || '/'
+})
+
 // Initial State
 const initialState = {
   transactions: [],
@@ -20,7 +25,7 @@ export const GlobalProvider = ({ children }) => {
   // Get Transactions
   async function getTransactions() {
     try {
-      const res = await axios.get('/api/v1/transactions')
+      const res = await api.get('/api/v1/transactions')
 
       dispatch({
         type: 'GET_TRANSACTIONS',
@@ -37,7 +42,7 @@ export const GlobalProvider = ({ children }) => {
   // Delete Transaction
   async function deleteTransaction(id) {
     try {
-      await axios.delete(`/api/v1/transactions/${id}`)
+      await api.delete(`/api/v1/transactions/${id}`)
 
       dispatch({
         type: 'DELETE_TRANSACTION',
@@ -54,7 +59,7 @@ export const GlobalProvider = ({ children }) => {
   // Add Transaction
   async function addTransaction(transaction) {
     try {
-      const res = await axios.post('/api/v1/transactions', transaction)
+      const res = await api.post('/api/v1/transactions', transaction)
 
       dispatch({
         type: 'ADD_TRANSACTION',
